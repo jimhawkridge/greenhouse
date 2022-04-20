@@ -1,0 +1,12 @@
+name = "greenhouse"
+compatibility_date = "2022-04-18"
+
+kv_namespaces = [ 
+    { binding = "GREENHOUSE", id = "x", preview_id = "x" }
+]
+
+[vars]
+OPENWEATHER_LOCATION = 2646265
+
+# [secrets]
+# OPENWEATHER_APPID
