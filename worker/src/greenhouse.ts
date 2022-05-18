@@ -42,6 +42,7 @@ function checkProps(message: any, props: Array<string>): boolean {
 }
 
 export async function makeReport(kv: KVNamespace, rawReport: any) {
+    // {"roofLOpen": false, "roofROpen": true, "tIn": 28, "hIn": 80, "tOut": 18, "hOut": 70}
     if (!checkProps(rawReport, ['roofLOpen', 'roofROpen', 'tIn', 'hIn', 'tOut', 'hOut'])) {
         console.error('Invalid raw message:', rawReport);
         return;
@@ -76,6 +77,8 @@ export async function makeReport(kv: KVNamespace, rawReport: any) {
             }
         })
     ]);
+
+    return report;
 }
 
 function compareReading(acc: MinMax, curr: number, timestamp: number) {
