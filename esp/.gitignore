@@ -1,3 +1,4 @@
 .vscode/
+build/
 main/server_details.h
 main/wifi_creds.h
