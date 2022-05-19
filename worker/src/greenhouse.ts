@@ -41,7 +41,21 @@ function checkProps(message: any, props: Array<string>): boolean {
     return props.every(prop => message.hasOwnProperty(prop));
 }
 
-export async function makeReport(kv: KVNamespace, rawReport: any) {
+async function logToAnalytics(analytics: string, report: Greenhouse) {
+    const payload = JSON.stringify(report);
+    const resp = await fetch(analytics, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: payload,
+    });
+    if (resp.status != 200) {
+        console.error('Error logging to analytics', resp.text());
+    }
+}
+
+export async function makeReport(kv: KVNamespace, rawReport: any, analytics?: string) {
     // {"roofLOpen": false, "roofROpen": true, "tIn": 28, "hIn": 80, "tOut": 18, "hOut": 70}
     if (!checkProps(rawReport, ['roofLOpen', 'roofROpen', 'tIn', 'hIn', 'tOut', 'hOut'])) {
         console.error('Invalid raw message:', rawReport);
@@ -65,6 +79,9 @@ export async function makeReport(kv: KVNamespace, rawReport: any) {
             humid: rawReport.hOut,
         }
     };
+    if (analytics) {
+        await logToAnalytics(analytics, report);
+    }
 
     const kvPayload = JSON.stringify(report);
     const logKey = 'report:' + report.timestamp;

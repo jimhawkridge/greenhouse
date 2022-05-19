@@ -7,4 +7,5 @@ interface Bindings {
   WARN_TEMP: number;
   OPEN_HOUR: number;
   CLOSE_HOUR: number;
+  ANALYTICS_URL: string;
 }
