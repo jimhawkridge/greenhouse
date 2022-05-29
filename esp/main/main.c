@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "esp_log.h"
 
+#include "monitor.h"
 #include "server_details.h"
 #include "wifi.h"
 
@@ -13,4 +14,6 @@ void app_main()
 
     wifi_init();
     wifi_connect();
+
+    monitor_watchdog(true);
 }

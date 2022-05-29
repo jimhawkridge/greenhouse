@@ -6,11 +6,47 @@
 #include "freertos/task.h"
 #include "driver/gpio.h"
 #include "esp_log.h"
+#include "esp_sleep.h"
 
 #include "dht22.h"
 #include "https.h"
 
 static const char *TAG = "MON";
+static int INTERVAL_MINS = 10;
+static bool SLEEP = true;
+
+static int wd;
+static void monitor_watchdog_task(void *pvParameters)
+{
+    while (1)
+    {
+        vTaskDelay(1000 / portTICK_RATE_MS);
+        wd--;
+        if (wd < 0)
+        {
+            ESP_LOGE(TAG, "Monitor watchdog forcing reset.");
+            esp_restart();
+        }
+    }
+}
+
+void monitor_reset_watchdog(bool first)
+{
+    if (first)
+    {
+        wd = 30;
+    }
+    else
+    {
+        wd = (INTERVAL_MINS + 1) * 60;
+    }
+}
+
+void monitor_watchdog()
+{
+    monitor_reset_watchdog(true);
+    xTaskCreate(&monitor_watchdog_task, "monitor_watchdog_task", 8192, NULL, 5, NULL);
+}
 
 static void monitor_task(void *pvParameters)
 {
@@ -33,9 +69,26 @@ static void monitor_task(void *pvParameters)
             in_reading.temperature, in_reading.humidity,
             out_reading.temperature, out_reading.humidity);
         ESP_LOGI(TAG, "Sending %s", buf);
-        https_post(buf);
+        if (https_post(buf))
+        {
+            monitor_reset_watchdog(false);
+        }
+        else
+        {
+            ESP_LOGE(TAG, "Resetting due to failed POST.");
+            esp_restart();
+        }
 
-        vTaskDelay(15000 / portTICK_RATE_MS);
+        if (SLEEP)
+        {
+            ESP_LOGI(TAG, "Sleeping CPU ");
+            esp_sleep_enable_timer_wakeup(INTERVAL_MINS * 60 * 1000000);
+            esp_deep_sleep_start();
+        }
+        else
+        {
+            vTaskDelay(INTERVAL_MINS * 60000 / portTICK_RATE_MS);
+        }
     }
 }
 

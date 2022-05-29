@@ -72,6 +72,7 @@ bool https_post(char *msg)
         }
     } while (written_bytes < strlen(wbuf));
 
+    bool success = true;
     ESP_LOGI(TAG, "Reading HTTP response...");
     do
     {
@@ -86,12 +87,15 @@ bool https_post(char *msg)
 
         if (ret < 0)
         {
+            putchar('\n');
             ESP_LOGE(TAG, "esp_tls_conn_read returned -0x%x", -ret);
+            success = false;
             break;
         }
 
         if (ret == 0)
         {
+            putchar('\n');
             ESP_LOGI(TAG, "connection closed");
             break;
         }
@@ -106,5 +110,5 @@ bool https_post(char *msg)
     putchar('\n');
     esp_tls_conn_delete(tls);
 
-    return true;
+    return success;
 }
