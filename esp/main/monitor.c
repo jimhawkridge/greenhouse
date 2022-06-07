@@ -59,6 +59,11 @@ static void monitor_task(void *pvParameters)
         bool door_left = gpio_get_level(GPIO_NUM_18);
         bool door_right = gpio_get_level(GPIO_NUM_19);
         ESP_LOGI(TAG, "Doors %d, %d", door_left, door_right);
+        if (!in_reading.success || !out_reading.success)
+        {
+            ESP_LOGE(TAG, "Resetting due to failed read.");
+            esp_restart();
+        }
 
         char buf[256];
         sprintf(
