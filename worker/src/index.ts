@@ -26,7 +26,7 @@ export default {
         if (report.in.temp > env.WARN_TEMP) {
           await notifyTooHot(env.PUSHOVER_TOKEN, env.PUSHOVER_USER, env.GREENHOUSE, report.in.temp);
         }
-        const isOpen = report.roofL || report.roofR;
+        const isOpen = report.roofL.open || report.roofR.open;
         if (!isOpen && currentHour() == env.OPEN_HOUR) {
           await notifyConsiderOpening(env.PUSHOVER_TOKEN, env.PUSHOVER_USER, env.GREENHOUSE, env.OPENWEATHER_LOCATION, env.OPENWEATHER_APPID);
         }
