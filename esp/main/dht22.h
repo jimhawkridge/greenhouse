@@ -5,4 +5,4 @@ typedef struct
     float humidity;
 } DHT22Reading;
 
-DHT22Reading readDHTSync(int DHTgpio);
+DHT22Reading dht22_read_sync(int DHTgpio);

@@ -101,7 +101,7 @@ To request data from DHT:
 
 #define MAXdhtData 5 // to complete 40 = 5*8 Bits
 
-DHT22Reading readDHTSync(int DHTgpio)
+DHT22Reading dht22_read_sync(int DHTgpio)
 {
     int uSec = 0;
 

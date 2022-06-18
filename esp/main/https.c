@@ -10,18 +10,14 @@
 #include "esp_log.h"
 #include "esp_system.h"
 #include "nvs_flash.h"
-#include "tcpip_adapter.h"
+#include "esp_netif.h"
+#include "esp_tls.h"
 
 #include "lwip/err.h"
 #include "lwip/sockets.h"
 #include "lwip/sys.h"
 #include "lwip/netdb.h"
 #include "lwip/dns.h"
-
-#include "esp_tls.h"
-
-// #include "esp_log.h"
-// #include "esp_tls.h"
 
 #include "server_details.h"
 
@@ -44,12 +40,11 @@ bool https_post(char *msg)
         .cacert_pem_buf = cert_pem_start,
         .cacert_pem_bytes = cert_pem_end - cert_pem_start,
     };
-    struct esp_tls *tls = esp_tls_conn_http_new(SERVER_URL, &cfg);
-
-    if (tls == NULL)
+    esp_tls_t *tls = esp_tls_init();
+    int res = esp_tls_conn_http_new_sync(SERVER_URL, &cfg, tls);
+    if (res != 1)
     {
         ESP_LOGE(TAG, "Connection failed...");
-        esp_tls_conn_delete(tls);
         return false;
     }
     ESP_LOGI(TAG, "Connection established...");
@@ -67,7 +62,7 @@ bool https_post(char *msg)
         else if (ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE)
         {
             ESP_LOGE(TAG, "esp_tls_conn_write returned 0x%x", ret);
-            esp_tls_conn_delete(tls);
+            esp_tls_conn_destroy(tls);
             return false;
         }
     } while (written_bytes < strlen(wbuf));
@@ -108,7 +103,7 @@ bool https_post(char *msg)
         }
     } while (1);
     putchar('\n');
-    esp_tls_conn_delete(tls);
+    esp_tls_conn_destroy(tls);
 
     return success;
 }

@@ -20,7 +20,7 @@ static void monitor_watchdog_task(void *pvParameters)
 {
     while (1)
     {
-        vTaskDelay(1000 / portTICK_RATE_MS);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
         wd--;
         if (wd < 0)
         {
@@ -52,9 +52,9 @@ static void monitor_task(void *pvParameters)
 {
     while (1)
     {
-        DHT22Reading in_reading = readDHTSync(4);
+        DHT22Reading in_reading = dht22_read_sync(4);
         ESP_LOGI(TAG, "In temp %d: %.1f %.1f", in_reading.success, in_reading.temperature, in_reading.humidity);
-        DHT22Reading out_reading = readDHTSync(5);
+        DHT22Reading out_reading = dht22_read_sync(5);
         ESP_LOGI(TAG, "Out temp %d: %.1f %.1f", out_reading.success, out_reading.temperature, out_reading.humidity);
         bool door_left = gpio_get_level(GPIO_NUM_18);
         bool door_right = gpio_get_level(GPIO_NUM_19);
@@ -92,7 +92,7 @@ static void monitor_task(void *pvParameters)
         }
         else
         {
-            vTaskDelay(INTERVAL_MINS * 60000 / portTICK_RATE_MS);
+            vTaskDelay(INTERVAL_MINS * 60000 / portTICK_PERIOD_MS);
         }
     }
 }
