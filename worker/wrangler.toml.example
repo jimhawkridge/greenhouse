@@ -5,6 +5,10 @@ kv_namespaces = [
     { binding = "GREENHOUSE", id = "x", preview_id = "x" }
 ]
 
+[[unsafe.bindings]]
+name = "GREENHOUSE_DATASET"
+type = "analytics_engine"
+
 [vars]
 OPENWEATHER_LOCATION = 1234567
 WARN_TEMP = 20

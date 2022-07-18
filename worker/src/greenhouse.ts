@@ -41,21 +41,32 @@ function checkProps(message: any, props: Array<string>): boolean {
     return props.every(prop => message.hasOwnProperty(prop));
 }
 
-async function logToAnalytics(analytics: string, report: Greenhouse) {
-    const payload = JSON.stringify(report);
-    const resp = await fetch(analytics, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: payload,
-    });
-    if (resp.status != 200) {
-        console.error('Error logging to analytics', resp.text());
-    }
+async function logToAnalytics(analytics: WorkersAnalyticsDataSet, report: Greenhouse) {
+    analytics.writeDataPoint({
+        blobs: [
+            // blob1: source - just in case there is more than one greenhouse ;-)
+            "jim",
+        ],
+        doubles: [
+            // double1: source timestamp
+            report.timestamp,
+            // double2: in temp
+            report.in.temp,
+            // double3: in humid
+            report.in.humid,
+            // double4: out temp
+            report.out.temp,
+            // double5: out humid
+            report.out.humid,
+            // double6: left door
+            report.roofL.open ? 1: 0,
+            // double7: right door
+            report.roofR.open ? 1: 0,
+        ]
+    })
 }
 
-export async function makeReport(kv: KVNamespace, rawReport: any, analytics?: string) {
+export async function makeReport(kv: KVNamespace, rawReport: any, analytics?: WorkersAnalyticsDataSet) {
     // {"roofLOpen": false, "roofROpen": true, "tIn": 28, "hIn": 80, "tOut": 18, "hOut": 70}
     if (!checkProps(rawReport, ['roofLOpen', 'roofROpen', 'tIn', 'hIn', 'tOut', 'hOut'])) {
         console.error('Invalid raw message:', rawReport);

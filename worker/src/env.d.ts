@@ -1,3 +1,12 @@
+interface WorkersAnalyticsDataPoint {
+  blobs?: Uint8Array[] | string[];
+  doubles?: number[];
+}
+interface WorkersAnalyticsDataSet {
+  writeEvent: (e: WorkersAnalyticsDataPoint) => Promise<void>;
+  writeDataPoint: (e: WorkersAnalyticsDataPoint) => Promise<void>;
+}
+
 interface Bindings {
   GREENHOUSE: KVNamespace;
   OPENWEATHER_LOCATION: string;
@@ -7,5 +16,5 @@ interface Bindings {
   WARN_TEMP: number;
   OPEN_HOUR: number;
   CLOSE_HOUR: number;
-  ANALYTICS_URL: string;
+  GREENHOUSE_DATASET: WorkersAnalyticsDataSet;
 }

@@ -22,7 +22,7 @@ export default {
 
       case '/report/':
         const rawReport = await request.json();
-        const report = await makeReport(env.GREENHOUSE, rawReport, env.ANALYTICS_URL);
+        const report = await makeReport(env.GREENHOUSE, rawReport, env.GREENHOUSE_DATASET);
         if (report.in.temp > env.WARN_TEMP) {
           await notifyTooHot(env.PUSHOVER_TOKEN, env.PUSHOVER_USER, env.GREENHOUSE, report.in.temp);
         }
